@@ -1,6 +1,6 @@
 "use client";
 
-import { JSX, useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AuthContext } from "./authContext";
 
@@ -18,8 +18,6 @@ export function withAuth<P extends object>(Component: React.ComponentType<P>) {
     return <Component {...props} />;
   };
 
-  // Better devtools name
-  // AuthenticatedComponent.displayName = `withAuth(${Component.displayName || Component.name})`;
 
   return AuthenticatedComponent;
 }

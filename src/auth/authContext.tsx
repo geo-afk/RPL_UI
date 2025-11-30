@@ -3,12 +3,13 @@
 import { createContext, useState, ReactNode } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
+import { api } from "@/lib/api"
 
 const url = "http://localhost:8080"
 
 interface AuthContextType {
     user: any;
-    login: (username: string, password: string) => Promise<void>;
+    login: (username: string, password: string) => Promise<any>;
     logout: () => void;
 }
 
@@ -16,7 +17,7 @@ export const AuthContext = createContext<AuthContextType | null>(null)
 
 
 export default function AuthProvider({ children }: { children: ReactNode }){
-    const [user, setUser] = useState(null)
+    const [user, setUser] = useState<any>(null)
     const router = useRouter()
 
     const login = async (username: string, password: string) => {
@@ -25,19 +26,20 @@ export default function AuthProvider({ children }: { children: ReactNode }){
             params.append("username", username)
             params.append("password", password)
 
-            const response = await axios.post(url + "/auth/token", params, {
-                headers: { "Content-Type": "application/x-www-form-urlencoded" }
-            })
+            const data = await api.userLogin(params)
+            console.log(data);
+            
 
-            axios.defaults.headers.common["Authorization"] =
-                `Bearer ${response.data.access_token}`
+            localStorage.setItem("token", data.access_token)
 
-            localStorage.setItem("token", response.data.access_token)
-
-            setUser(response.data)
+            setUser(data)
+            
             router.push("/")
+
+            return data.user
         } catch (error) {
             console.log("Login Failed: ", error)
+            return null
         }
     }
 

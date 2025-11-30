@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useContext} from 'react';
 import {
   Menu,
   X,
@@ -20,91 +20,42 @@ import {
   LogOut,
   User as UserIcon,
 } from 'lucide-react';
-import { api } from '../lib/api';
-import { AuditLogEntry, EvaluateResult, FileSystemNode, PolicyAnalysis, Resource, Role, User } from '@/models/model';
+import { User } from '@/models/model';
 import Login  from './login/page';
 import ThemedFileManager from './file-browser/page';
 import { PolicyEditor } from './rpl_editor/page';
 import { DatabaseViewer } from './database/page';
 import { RolesPage } from './roles/page';
-import { Simulation } from './simulation/page';
 import { AuditLogs } from './audit/page';
 import { AIInsights } from './insights/page';
 import Dashboard from './dashboard/page';
-import { UsersPage } from './user_page/page';
 import { ApiExplorer } from './api_explorer/page';
+import { ThemeContext } from '@/theme/ThemeContext';
+import Simulation from './simulation/page';
+import UsersPage from './user_page/page';
 
 export function App(){
   const [darkMode, setDarkMode] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<string>('login');
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
-
-  const [users, setUsers] = useState<User[]>([]);
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [auditLogs, setAuditLogs] = useState<
-    AuditLogEntry[]
-  >([]);
-  const [analysis, setAnalysis] = useState<PolicyAnalysis | null>(null);
-  const [policyCode, setPolicyCode] = useState<string>('');
-  const [fileSystem, setFileSystem] = useState<FileSystemNode | null>(null);
   const [toast, setToast] = useState<{ message: string; type?: string } | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null); 
   
   useEffect(() => {
     if (currentUser) {
-      loadData();
     }
   }, [currentUser]);
 
-  const loadData = async (): Promise<void> => {
-    const [u, r, a, pc, fs, ro] = await Promise.all([
-      api.getUsers(),
-      api.getResources(),
-      api.getPolicyAnalysis(),
-      api.getPolicyCode(),
-      api.getFileSystem(),
-      api.getRoles()
-    ]);
-    setUsers(u);
-    setResources(r);
-    setAnalysis(a);
-    setPolicyCode(pc);
-    setFileSystem(fs);
-    setRoles(ro);
-  };
+   const themeContext = useContext(ThemeContext);
+    const theme = themeContext?.theme
+    const changeTheme = themeContext?.changeTheme
+
+
 
   const showToast = (message: string, type?: string): void => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
-  };
-
-  const simulateAccess = async (user: string, resource: string, action: string): Promise<EvaluateResult> => {
-    // Restrict simulation to logged-in user or admins
-    if (currentUser && currentUser.role !== 'Admin' && user !== currentUser.name) {
-      showToast('Access denied: Can only simulate own access', 'error');
-      return { allowed: false, rule: 'DENY: Unauthorized simulation', riskScore: 100, trace: [] };
-    }
-    setLoading(true);
-    try {
-      const result = await api.evaluate(user, resource, action);
-      const logEntry: AuditLogEntry = {
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        user,
-        resource,
-        action,
-        result: result.allowed ? 'allowed' : 'denied',
-        reason: result.rule,
-        riskScore: result.riskScore
-      };
-      setAuditLogs((prev) => [logEntry, ...prev]);
-      showToast(`Access ${result.allowed ? 'granted' : 'denied'}: ${result.rule}`, result.allowed ? 'success' : 'error');
-      return result;
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleLogin = (user: any) => {
@@ -116,7 +67,6 @@ export function App(){
   const handleLogout = () => {
     setCurrentUser(null);
     setCurrentPage('login');
-    setAuditLogs([]);
     showToast('Logged out successfully', 'info');
   };
 
@@ -260,7 +210,7 @@ export function App(){
               {/* Sidebar Footer */}
               <div className="p-4 border-t border-gray-700/50">
                 <button
-                  onClick={() => setDarkMode(!darkMode)}
+                  onClick={() => { setDarkMode(!darkMode); changeTheme!(!darkMode) }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     darkMode ? 'bg-gray-700/50 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'
                   }`}
@@ -306,11 +256,11 @@ export function App(){
             </header>
 
             <main className="p-8 max-w-[1600px] mx-auto">
-              {currentPage === 'dashboard' && analysis !== null && (
-                <Dashboard darkMode={darkMode} cardClass={cardClass}  />
+              {currentPage === 'dashboard' && (
+                <Dashboard />
               )}
              
-              {currentPage === 'file-browser' && fileSystem !== null && (
+              {currentPage === 'file-browser' && (
                 <ThemedFileManager
                     darkMode={darkMode}
                     cardClass={cardClass}
@@ -328,37 +278,29 @@ export function App(){
                   darkMode={darkMode}
                   cardClass={cardClass}
                   inputClass={inputClass}
-                  simulateAccess={simulateAccess}
-                  users={users}
                 />
               )}
               {currentPage === 'api-explorer' && (
                 <ApiExplorer
                   darkMode={darkMode}
-                  // cardClass={cardClass}
-                  // inputClass={inputClass}
                 />
               )}
-              {currentPage === 'roles' && <RolesPage darkMode={darkMode} cardClass={cardClass} roles={roles} />}
+              {currentPage === 'roles' && <RolesPage darkMode={darkMode} cardClass={cardClass} />}
               {currentPage === 'users' && (
-                <UsersPage darkMode={darkMode} cardClass={cardClass} inputClass={inputClass} users={users} setUsers={setUsers} />
+                <UsersPage darkMode={darkMode} cardClass={cardClass} inputClass={inputClass} />
               )}
               {currentPage === 'simulation' && (
                 <Simulation
                   darkMode={darkMode}
                   cardClass={cardClass}
                   inputClass={inputClass}
-                  users={users}
-                  resources={resources}
-                  simulateAccess={simulateAccess}
-                  loading={loading}
                 />
               )}
               {currentPage === 'audit' && (
                 <AuditLogs darkMode={darkMode} cardClass={cardClass} inputClass={inputClass}  />
               )}
-              {currentPage === 'ai-insights' && analysis !== null && (
-                <AIInsights darkMode={darkMode} cardClass={cardClass} analysis={analysis} loadData={loadData} />
+              {currentPage === 'ai-insights' && (
+                <AIInsights darkMode={darkMode} cardClass={cardClass}  />
               )}
             </main>
           </div>

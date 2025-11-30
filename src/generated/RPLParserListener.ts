@@ -16,8 +16,10 @@ import { ValidFromContext } from "./RPLParser.js";
 import { ValidUntilContext } from "./RPLParser.js";
 import { ResourceDeclarationContext } from "./RPLParser.js";
 import { ResourceBodyContext } from "./RPLParser.js";
-import { ResourceAttributesContext } from "./RPLParser.js";
-import { ResourceAttributeContext } from "./RPLParser.js";
+import { ResourcePropertyContext } from "./RPLParser.js";
+import { ResourceTypeContext } from "./RPLParser.js";
+import { MetadataBlockContext } from "./RPLParser.js";
+import { MetadataEntryContext } from "./RPLParser.js";
 import { ResourceListContext } from "./RPLParser.js";
 import { ResourceRefContext } from "./RPLParser.js";
 import { GroupDeclarationContext } from "./RPLParser.js";
@@ -191,25 +193,45 @@ export class RPLParserListener implements ParseTreeListener {
      */
     exitResourceBody?: (ctx: ResourceBodyContext) => void;
     /**
-     * Enter a parse tree produced by `RPLParser.resourceAttributes`.
+     * Enter a parse tree produced by `RPLParser.resourceProperty`.
      * @param ctx the parse tree
      */
-    enterResourceAttributes?: (ctx: ResourceAttributesContext) => void;
+    enterResourceProperty?: (ctx: ResourcePropertyContext) => void;
     /**
-     * Exit a parse tree produced by `RPLParser.resourceAttributes`.
+     * Exit a parse tree produced by `RPLParser.resourceProperty`.
      * @param ctx the parse tree
      */
-    exitResourceAttributes?: (ctx: ResourceAttributesContext) => void;
+    exitResourceProperty?: (ctx: ResourcePropertyContext) => void;
     /**
-     * Enter a parse tree produced by `RPLParser.resourceAttribute`.
+     * Enter a parse tree produced by `RPLParser.resourceType`.
      * @param ctx the parse tree
      */
-    enterResourceAttribute?: (ctx: ResourceAttributeContext) => void;
+    enterResourceType?: (ctx: ResourceTypeContext) => void;
     /**
-     * Exit a parse tree produced by `RPLParser.resourceAttribute`.
+     * Exit a parse tree produced by `RPLParser.resourceType`.
      * @param ctx the parse tree
      */
-    exitResourceAttribute?: (ctx: ResourceAttributeContext) => void;
+    exitResourceType?: (ctx: ResourceTypeContext) => void;
+    /**
+     * Enter a parse tree produced by `RPLParser.metadataBlock`.
+     * @param ctx the parse tree
+     */
+    enterMetadataBlock?: (ctx: MetadataBlockContext) => void;
+    /**
+     * Exit a parse tree produced by `RPLParser.metadataBlock`.
+     * @param ctx the parse tree
+     */
+    exitMetadataBlock?: (ctx: MetadataBlockContext) => void;
+    /**
+     * Enter a parse tree produced by `RPLParser.metadataEntry`.
+     * @param ctx the parse tree
+     */
+    enterMetadataEntry?: (ctx: MetadataEntryContext) => void;
+    /**
+     * Exit a parse tree produced by `RPLParser.metadataEntry`.
+     * @param ctx the parse tree
+     */
+    exitMetadataEntry?: (ctx: MetadataEntryContext) => void;
     /**
      * Enter a parse tree produced by `RPLParser.resourceList`.
      * @param ctx the parse tree

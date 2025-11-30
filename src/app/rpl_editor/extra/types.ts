@@ -1,5 +1,13 @@
+export interface Finding {
+    line: number;
+    risk_score: number;
+    description: string;
+    recommendation: string;
+}
+
 export interface PolicyResponse {
-    message: Record<string, any>;
+    findings: Finding[];
+    risk_score: number;
 }
 
 

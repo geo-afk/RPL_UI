@@ -1,21 +1,27 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { 
   BookOpen, Code, Shield,CheckCircle, ArrowRight, 
   PlayCircle, FileText, Lightbulb,Sparkles
 } from 'lucide-react';
 import { Examples, Features, getKeywords, getOperatorsAndExpressions, getTemplateString, getThemeClasses, TutorialSteps } from './utils/utils';
 import "./Dashboard.css"
+import { ThemeContext } from '@/theme/ThemeContext';
 
-interface DashboardProps {
-  darkMode: boolean;
-  cardClass: string;
-}
-
-export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
+export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [currentStep, setCurrentStep] = useState(0);
+
+  const themeContext = useContext(ThemeContext);
+  const theme = themeContext?.theme
+  const themMode = themeContext?.isDarkMode()
+
+
+  function isDarkMode() {
+    return themMode ?? true
+  }
+  
 
   
 
@@ -30,7 +36,7 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
     textClass,
     borderClass,
     mutedBg,
-  } = getThemeClasses(darkMode)
+  } = getThemeClasses(isDarkMode())
  
 
   const tabs = [
@@ -46,11 +52,11 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
       <div className="max-w-7xl mx-auto mb-8">
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-3">
-            <div className={`p-3 ${darkMode ? 'bg-indigo-600' : 'bg-indigo-700'} rounded-xl shadow-lg`}>
+            <div className={`p-3 ${isDarkMode() ? 'bg-indigo-600' : 'bg-indigo-700'} rounded-xl shadow-lg`}>
               <Shield className="text-white" size={34} />
             </div>
             <div>
-              <h1 className={`text-4xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              <h1 className={`text-4xl font-bold ${isDarkMode() ? 'text-white' : 'text-gray-900'}`}>
                 Resource Policy Language
               </h1>
               <p className={`text-sm ${textClass} flex items-center gap-2 mt-1`}>
@@ -72,8 +78,8 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`group relative rounded-xl p-4 transition-all duration-300 border ${
                   isActive
-                    ? `${darkMode ? 'bg-indigo-600 border-indigo-500' : 'bg-indigo-600 border-indigo-700'} text-white shadow-xl scale-105`
-                    : `${cardClass} ${borderClass} hover:border-indigo-500 hover:shadow-md ${accentHover}`
+                    ? `${isDarkMode() ? 'bg-indigo-600 border-indigo-500' : 'bg-indigo-600 border-indigo-700'} text-white shadow-xl scale-105`
+                    : `${theme?.cardClass} ${borderClass} hover:border-indigo-500 hover:shadow-md ${accentHover}`
                 }`}
               >
                 <div className="flex flex-col items-center gap-2">
@@ -95,9 +101,9 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
         {activeTab === 'overview' && (
           <div className="space-y-6 animate-fade-in">
             {/* What is RPL */}
-            <div className={`${cardClass} rounded-xl p-8 border ${borderClass} shadow-lg hover:shadow-xl transition-shadow`}>
+            <div className={`${theme?.cardClass} rounded-xl p-8 border ${borderClass} shadow-lg hover:shadow-xl transition-shadow`}>
               <div className="flex items-start gap-4">
-                <div className={`p-4 ${darkMode ? 'bg-indigo-600' : 'bg-indigo-700'} rounded-xl shadow-lg`}>
+                <div className={`p-4 ${isDarkMode() ? 'bg-indigo-600' : 'bg-indigo-700'} rounded-xl shadow-lg`}>
                   <Shield className="text-white" size={32} />
                 </div>
                 <div className="flex-1">
@@ -109,7 +115,7 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
                   </p>
                   <div className="flex flex-wrap gap-3">
                     {['Human-Readable', 'Type-Safe', 'Production-Ready'].map(tag => (
-                      <span key={tag} className={`${darkMode ? 'bg-indigo-900/50 text-indigo-300' : 'bg-indigo-100 text-indigo-800'} px-4 py-2 rounded-full text-sm font-medium`}>
+                      <span key={tag} className={`${isDarkMode() ? 'bg-indigo-900/50 text-indigo-300' : 'bg-indigo-100 text-indigo-800'} px-4 py-2 rounded-full text-sm font-medium`}>
                         {tag}
                       </span>
                     ))}
@@ -123,7 +129,7 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
               {Features.map((feature, idx) => {
                 const Icon = feature.icon;
                 return (
-                  <div key={idx} className={`${cardClass} rounded-xl p-6 border ${borderClass} hover:shadow-xl transition-all hover:scale-105`}>
+                  <div key={idx} className={`${theme?.cardClass} rounded-xl p-6 border ${borderClass} hover:shadow-xl transition-all hover:scale-105`}>
                     <div className={`p-3 ${accentBg} rounded-xl inline-block mb-4`}>
                       <Icon size={24} className={accent} />
                     </div>
@@ -135,7 +141,7 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
             </div>
 
             {/* Quick Start */}
-            <div className={`${cardClass} rounded-xl p-8 border ${borderClass} hover:shadow-lg transition-shadow`}>
+            <div className={`${theme?.cardClass} rounded-xl p-8 border ${borderClass} hover:shadow-lg transition-shadow`}>
               <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
                 <div className={`p-2 ${accentBg} rounded-lg`}>
                   <Lightbulb className={accent} size={28} />
@@ -150,7 +156,7 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
                   { title: "Create Policy Rules", desc: "Write ALLOW and DENY rules with optional conditions" }
                 ].map((step, idx) => (
                   <div key={idx} className="flex items-start gap-4 group">
-                    <div className={`shrink-0 w-10 h-10 ${darkMode ? 'bg-indigo-600' : 'bg-indigo-700'} text-white rounded-xl flex items-center justify-center font-bold shadow-md group-hover:scale-110 transition-transform`}>
+                    <div className={`shrink-0 w-10 h-10 ${isDarkMode() ? 'bg-indigo-600' : 'bg-indigo-700'} text-white rounded-xl flex items-center justify-center font-bold shadow-md group-hover:scale-110 transition-transform`}>
                       {idx + 1}
                     </div>
                     <div className="flex-1">
@@ -168,7 +174,7 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
         {activeTab === 'tutorial' && (
           <div className="space-y-6 animate-fade-in">
             {/* Progress Bar */}
-            <div className={`${cardClass} rounded-xl p-6 border ${borderClass} shadow-lg`}>
+            <div className={`${theme?.cardClass} rounded-xl p-6 border ${borderClass} shadow-lg`}>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold">Tutorial Progress</h3>
                 <span className={`${accentBg} ${accentText} px-4 py-2 rounded-full text-sm font-bold`}>
@@ -177,16 +183,16 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
               </div>
               <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
                 <div
-                  className={`${darkMode ? 'bg-indigo-600' : 'bg-indigo-700'} h-full transition-all duration-500`}
+                  className={`${isDarkMode() ? 'bg-indigo-600' : 'bg-indigo-700'} h-full transition-all duration-500`}
                   style={{ width: `${((currentStep + 1) / TutorialSteps.length) * 100}%` }}
                 />
               </div>
             </div>
 
             {/* Current Step */}
-            <div className={`${cardClass} rounded-xl p-8 border ${borderClass} shadow-lg`}>
+            <div className={`${theme?.cardClass} rounded-xl p-8 border ${borderClass} shadow-lg`}>
               <div className="flex items-start gap-4 mb-6">
-                <div className={`p-4 ${darkMode ? 'bg-indigo-600' : 'bg-indigo-700'} rounded-xl shadow-lg`}>
+                <div className={`p-4 ${isDarkMode() ? 'bg-indigo-600' : 'bg-indigo-700'} rounded-xl shadow-lg`}>
                   {React.createElement(TutorialSteps[currentStep].icon, {
                     className: "text-white",
                     size: 40
@@ -238,7 +244,7 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
             </div>
 
             {/* All Steps Overview */}
-            <div className={`${cardClass} rounded-xl p-6 border ${borderClass}`}>
+            <div className={`${theme?.cardClass} rounded-xl p-6 border ${borderClass}`}>
               <h3 className="text-xl font-bold mb-4">All Steps</h3>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                 {TutorialSteps.map((step, idx) => (
@@ -247,7 +253,7 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
                     onClick={() => setCurrentStep(idx)}
                     className={`p-4 rounded-xl border-2 transition-all hover:scale-105 ${
                       idx === currentStep
-                        ? `border-indigo-600 ${darkMode ? 'bg-indigo-900/30' : 'bg-indigo-50'} shadow-lg`
+                        ? `border-indigo-600 ${isDarkMode() ? 'bg-indigo-900/30' : 'bg-indigo-50'} shadow-lg`
                         : `${borderClass} hover:border-indigo-500`
                     }`}
                   >
@@ -270,17 +276,17 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
         {/* Examples Tab */}
         {activeTab === 'examples' && (
           <div className="space-y-6 animate-fade-in">
-            <div className={`${cardClass} rounded-xl p-6 border ${borderClass} ${accentBg}`}>
+            <div className={`${theme?.cardClass} rounded-xl p-6 border ${borderClass} ${accentBg}`}>
               <h2 className="text-2xl font-bold mb-2">Real-World Examples</h2>
               <p className={textClass}>Common patterns you can use in your policies</p>
             </div>
 
             {Examples.map((example, idx) => (
-              <div key={idx} className={`${cardClass} rounded-xl p-6 border ${borderClass} hover:shadow-xl transition-all hover:scale-[1.02]`}>
+              <div key={idx} className={`${theme?.cardClass} rounded-xl p-6 border ${borderClass} hover:shadow-xl transition-all hover:scale-[1.02]`}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className={`${darkMode ? 'bg-indigo-600' : 'bg-indigo-700'} text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm`}>
+                      <span className={`${isDarkMode() ? 'bg-indigo-600' : 'bg-indigo-700'} text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm`}>
                         {idx + 1}
                       </span>
                       <h3 className="text-xl font-bold">{example.title}</h3>
@@ -303,13 +309,13 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
         {/* Syntax Guide Tab */}
         {activeTab === 'syntax' && (
           <div className="space-y-6 animate-fade-in">
-            <div className={`${cardClass} rounded-xl p-6 border ${borderClass} ${accentBg}`}>
+            <div className={`${theme?.cardClass} rounded-xl p-6 border ${borderClass} ${accentBg}`}>
               <h2 className="text-2xl font-bold mb-2">Complete Syntax Reference</h2>
               <p className={textClass}>Full RPL language specification</p>
             </div>
 
             {/* Keywords */}
-            <div className={`${cardClass} rounded-xl p-6 border ${borderClass}`}>
+            <div className={`${theme?.cardClass} rounded-xl p-6 border ${borderClass}`}>
               <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
                 <div className={`p-2 ${accentBg} rounded-lg`}>
                   <Code size={24} className={accent} />
@@ -326,12 +332,12 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
             </div>
 
             {/* Operators */}
-            <div className={`${cardClass} rounded-xl p-6 border ${borderClass}`}>
+            <div className={`${theme?.cardClass} rounded-xl p-6 border ${borderClass}`}>
               <h3 className="text-xl font-bold mb-4">Operators & Expressions</h3>
               <div className="space-y-3">
                 { getOperatorsAndExpressions().map((item, idx) => (
                   <div key={idx} className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <code className={`${darkMode ? 'bg-indigo-600' : 'bg-indigo-700'} text-white px-4 py-2 rounded-lg font-mono font-bold shadow-md min-w-[140px] text-center`}>
+                    <code className={`${isDarkMode() ? 'bg-indigo-600' : 'bg-indigo-700'} text-white px-4 py-2 rounded-lg font-mono font-bold shadow-md min-w-[140px] text-center`}>
                       {item.op}
                     </code>
                     <span className={textClass}>{item.desc}</span>
@@ -341,7 +347,7 @@ export default function Dashboard({ darkMode, cardClass }: DashboardProps) {
             </div>
 
             {/* Structure */}
-            <div className={`${cardClass} rounded-xl p-6 border ${borderClass}`}>
+            <div className={`${theme?.cardClass} rounded-xl p-6 border ${borderClass}`}>
               <h3 className="text-xl font-bold mb-4">Policy Structure Template</h3>
               <div className="bg-gray-900 rounded-xl p-6 overflow-x-auto shadow-lg border border-gray-800">
                 <pre className="text-green-400 font-mono text-sm leading-relaxed">

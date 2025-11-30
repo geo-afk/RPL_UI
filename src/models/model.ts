@@ -91,8 +91,6 @@ export interface DatabaseViewerProps {
     darkMode: boolean;
     cardClass: string;
     inputClass: string;
-    simulateAccess: (user: string, resource: string, action: string) => Promise<SimulateAccessResult>;
-    users: User[];
 }
 
 
@@ -120,3 +118,13 @@ export interface PolicyEditorProps {
 }
 
 
+
+
+
+export interface RegisterUserRequest {
+    first_name: string;
+    last_name: string;
+    username: string;
+    email: string;
+    password: string;
+}
